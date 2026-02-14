@@ -73,23 +73,33 @@ describe('Block Editor', () => {
 		cy.login();
 		cy.deactivatePlugin('classic-editor');
 
-		// Disable the welcome guide before visiting the editor so it doesn't cover the UI.
-		cy.wpCli('user meta update admin wp_persisted_preferences \'{"core/edit-post":{"welcomeGuide":false},"core":{"distractionFree":false}}\' --format=json');
+		// Disable the welcome guide and starter patterns modal before visiting the editor.
+		cy.wpCli('option set wp_page_for_privacy_policy 0');
+		cy.wpCli('user meta update admin wp_persisted_preferences \'{"core/edit-post":{"welcomeGuide":false},"core/edit-page":{"welcomeGuide":false},"core":{"distractionFree":false,"isResumed":true}}\' --format=json');
 
 		cy.visit('/wp-admin/post-new.php?post_type=page');
 		cy.url().should('contain', '/wp-admin/post-new.php?post_type=page');
 
 		// Wait for the editor to fully load, then dismiss the "Choose a pattern" modal
-		// that WordPress 6.x+ shows on new page creation. We must wait long enough for the
-		// modal to render asynchronously after the editor initializes.
+		// that WordPress 6.x+ shows on new page creation.
 		cy.get('iframe[name="editor-canvas"]', { timeout: 10000 }).should('exist');
 		// eslint-disable-next-line cypress/no-unnecessary-waiting
 		cy.wait(3000);
-		cy.get('body').then(($body) => {
-			if ($body.find('.components-modal__frame').length) {
-				cy.get('.components-modal__frame button[aria-label="Close"]').click({ force: true });
+		cy.document().then((doc) => {
+			const overlay = doc.querySelector('.components-modal__screen-overlay');
+			if (overlay) {
+				// Find the close button — typically the last button in the modal header.
+				const closeBtn =
+					overlay.querySelector('button[aria-label="Close"]') ||
+					overlay.querySelector('button[aria-label="Close dialog"]') ||
+					overlay.querySelector('.components-modal__header button');
+				if (closeBtn) {
+					closeBtn.click();
+				}
 			}
 		});
+		// Verify the overlay is gone before proceeding.
+		cy.get('.components-modal__screen-overlay', { timeout: 5000 }).should('not.exist');
 
 		// In WordPress 6.x+, the editor canvas is inside an iframe.
 		cy.get('iframe[name="editor-canvas"]')
