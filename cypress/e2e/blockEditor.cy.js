@@ -22,11 +22,11 @@ const selectors = {
 };
 
 const clickCustom = () => {
-	selectors.chooseCustom().click();
+	selectors.chooseCustom().click({ force: true });
 };
 
 const clickWordPress = () => {
-	selectors.chooseWordPress().click();
+	selectors.chooseWordPress().click({ force: true });
 };
 
 const openPanel = () => {
@@ -72,15 +72,13 @@ describe('Block Editor', () => {
 	it('supports Page Links To panel with radio buttons, URL persistence, and new tab checkbox', () => {
 		cy.login();
 		cy.deactivatePlugin('classic-editor');
+
+		// Disable editor modals (welcome guide, pattern chooser) via user preferences
+		// before visiting the editor so they don't cover the UI.
+		cy.wpCli(`eval '$prefs = get_user_meta(1, "wp_persisted_preferences", true); if (!is_array($prefs)) $prefs = []; $prefs["core/edit-post"] = ["welcomeGuide" => false]; $prefs["core/edit-page"] = ["welcomeGuide" => false]; $prefs["core"] = array_merge($prefs["core"] ?? [], ["enableChoosePatternModal" => false, "distractionFree" => false, "isResumed" => true]); $prefs["_modified"] = gmdate("c"); update_user_meta(1, "wp_persisted_preferences", $prefs);'`);
+
 		cy.visit('/wp-admin/post-new.php?post_type=page');
 		cy.url().should('contain', '/wp-admin/post-new.php?post_type=page');
-
-		// Close the welcome dialog if it appears.
-		cy.get('body').then(($body) => {
-			if ($body.find('button[aria-label="Close dialog"]').length) {
-				cy.get('button[aria-label="Close dialog"]').click({ force: true });
-			}
-		});
 
 		// In WordPress 6.x+, the editor canvas is inside an iframe.
 		cy.get('iframe[name="editor-canvas"]')
@@ -89,6 +87,7 @@ describe('Block Editor', () => {
 			.then(cy.wrap)
 			.find('[aria-label="Add title"], .editor-post-title__input')
 			.first()
+			.click({ force: true })
 			.type(draftTitle);
 
 		// Open the PLT panel.
