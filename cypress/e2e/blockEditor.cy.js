@@ -22,11 +22,11 @@ const selectors = {
 };
 
 const clickCustom = () => {
-	selectors.chooseCustom().click();
+	selectors.chooseCustom().click({ force: true });
 };
 
 const clickWordPress = () => {
-	selectors.chooseWordPress().click();
+	selectors.chooseWordPress().click({ force: true });
 };
 
 const openPanel = () => {
