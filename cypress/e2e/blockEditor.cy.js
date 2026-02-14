@@ -72,19 +72,19 @@ describe('Block Editor', () => {
 	it('supports Page Links To panel with radio buttons, URL persistence, and new tab checkbox', () => {
 		cy.login();
 		cy.deactivatePlugin('classic-editor');
+
+		// Disable the welcome guide before visiting the editor so it doesn't cover the UI.
+		cy.wpCli('user meta update admin wp_persisted_preferences \'{"core/edit-post":{"welcomeGuide":false},"core":{"distractionFree":false}}\' --format=json');
+
 		cy.visit('/wp-admin/post-new.php?post_type=page');
 		cy.url().should('contain', '/wp-admin/post-new.php?post_type=page');
 
-		// Close any dialogs/modals that may appear (welcome guide, start page options, etc.).
+		// Dismiss any modal dialogs that may appear (e.g., "Start with a pattern" in WP 6.x+).
+		// eslint-disable-next-line cypress/no-unnecessary-waiting
+		cy.wait(2000);
 		cy.get('body').then(($body) => {
-			// Close the welcome guide dialog.
-			if ($body.find('button[aria-label="Close dialog"]').length) {
-				cy.get('button[aria-label="Close dialog"]').click({ force: true });
-			}
-			// Close the "Start with a pattern" page options modal (WordPress 6.x+).
-			if ($body.find('.editor-start-page-options__modal__actions').length) {
-				// Click the close button on the modal, or press Escape to dismiss it.
-				cy.get('body').type('{esc}');
+			if ($body.find('.components-modal__frame').length) {
+				cy.get('.components-modal__header button').first().click({ force: true });
 			}
 		});
 
@@ -95,6 +95,7 @@ describe('Block Editor', () => {
 			.then(cy.wrap)
 			.find('[aria-label="Add title"], .editor-post-title__input')
 			.first()
+			.click({ force: true })
 			.type(draftTitle);
 
 		// Open the PLT panel.
