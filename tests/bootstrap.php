@@ -31,15 +31,15 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 require $_tests_dir . '/includes/bootstrap.php';
 
 class CWS_PLT_TestCase extends WP_UnitTestCase {
-	function plugin() {
+	public function plugin() {
 		return CWS_PageLinksTo::$instance;
 	}
 
-	function set_post( $key, $value ) {
+	public function set_post( $key, $value ): void {
 		$_POST[$key] = $_REQUEST[$key] = addslashes( $value );
 	}
 
-	function unset_post( $key ) {
+	public function unset_post( $key ): void {
 		unset( $_POST[$key], $_REQUEST[$key] );
 	}
 }

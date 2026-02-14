@@ -1,7 +1,7 @@
 <?php
 
 class CWS_PLT_Test_Utils extends CWS_PLT_TestCase {
-	function test_clean_url() {
+	public function test_clean_url(): void {
 		foreach ( array(
 			'http://example.com/' => 'http://example.com/',
 			'  http://example.com/  ' => 'http://example.com/',
