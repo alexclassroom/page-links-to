@@ -853,6 +853,10 @@ class CWS_PageLinksTo {
 	 * @return array modified nav menu items.
 	 */
 	public static function wp_nav_menu_objects( $items ) {
+		if ( ! is_array( $items ) ) {
+			return $items;
+		}
+
 		$new_items = array();
 
 		foreach ( $items as $item ) {
