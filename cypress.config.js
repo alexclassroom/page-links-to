@@ -1,8 +1,17 @@
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
+  allowCypressEnv: false,
   e2e: {
     baseUrl: 'https://plugins.test',
-		testIsolation: false, // TODO: Remove this line when tests can run isolated.
+    setupNodeEvents(on, config) {
+      const baseUrl = config.env.baseUrl || null;
+
+      if (baseUrl) {
+        config.baseUrl = baseUrl;
+      }
+
+      return config;
+    },
   },
 })
