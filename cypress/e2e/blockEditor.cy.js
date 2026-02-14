@@ -75,10 +75,16 @@ describe('Block Editor', () => {
 		cy.visit('/wp-admin/post-new.php?post_type=page');
 		cy.url().should('contain', '/wp-admin/post-new.php?post_type=page');
 
-		// Close the welcome dialog if it appears.
+		// Close any dialogs/modals that may appear (welcome guide, start page options, etc.).
 		cy.get('body').then(($body) => {
+			// Close the welcome guide dialog.
 			if ($body.find('button[aria-label="Close dialog"]').length) {
 				cy.get('button[aria-label="Close dialog"]').click({ force: true });
+			}
+			// Close the "Start with a pattern" page options modal (WordPress 6.x+).
+			if ($body.find('.editor-start-page-options__modal__actions').length) {
+				// Click the close button on the modal, or press Escape to dismiss it.
+				cy.get('body').type('{esc}');
 			}
 		});
 
