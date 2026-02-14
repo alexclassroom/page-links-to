@@ -79,12 +79,15 @@ describe('Block Editor', () => {
 		cy.visit('/wp-admin/post-new.php?post_type=page');
 		cy.url().should('contain', '/wp-admin/post-new.php?post_type=page');
 
-		// Dismiss any modal dialogs that may appear (e.g., "Start with a pattern" in WP 6.x+).
+		// Wait for the editor to fully load, then dismiss the "Choose a pattern" modal
+		// that WordPress 6.x+ shows on new page creation. We must wait long enough for the
+		// modal to render asynchronously after the editor initializes.
+		cy.get('iframe[name="editor-canvas"]', { timeout: 10000 }).should('exist');
 		// eslint-disable-next-line cypress/no-unnecessary-waiting
-		cy.wait(2000);
+		cy.wait(3000);
 		cy.get('body').then(($body) => {
 			if ($body.find('.components-modal__frame').length) {
-				cy.get('.components-modal__header button').first().click({ force: true });
+				cy.get('.components-modal__frame button[aria-label="Close"]').click({ force: true });
 			}
 		});
 
