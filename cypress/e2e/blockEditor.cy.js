@@ -30,41 +30,31 @@ const clickWordPress = () => {
 };
 
 const openPanel = () => {
-	cy.get('@panel').then(($panel) => {
+	cy.get('.plt-panel').then(($panel) => {
 		if (!$panel.hasClass('is-opened')) {
 			cy.wrap($panel).click();
 		}
 	});
 };
 
+const scrollPanelIntoView = () => {
+	cy.get('.plt-panel').scrollIntoView();
+};
+
 const assertWordPress = () => {
-	it('normal WordPress URL is selected', () => {
-		selectors.chooseWordPress().should('be.visible').and('be.checked');
-	});
-
-	it('custom URL is not selected', () => {
-		selectors.chooseCustom().should('be.visible').and('not.be.checked');
-	});
-
-	it('custom URL UI is not visible', () => {
-		selectors.url().should('not.be.visible');
-		selectors.newTab().should('not.be.visible');
-	});
+	scrollPanelIntoView();
+	selectors.chooseWordPress().should('be.visible').and('be.checked');
+	selectors.chooseCustom().should('be.visible').and('not.be.checked');
+	cy.get('[data-testid=plt-url]').should('not.exist');
+	cy.get('[data-testid=plt-newtab]').should('not.exist');
 };
 
 const assertCustom = () => {
-	it('custom URL is selected', () => {
-		selectors.chooseCustom().should('be.visible').and('be.checked');
-	});
-
-	it('normal WordPress URL is not selected', () => {
-		selectors.chooseWordPress().should('be.visible').and('not.be.checked');
-	});
-
-	it('custom URL UI is visible', () => {
-		selectors.url().should('be.visible');
-		selectors.newTab().should('be.visible');
-	});
+	scrollPanelIntoView();
+	selectors.chooseCustom().should('be.visible').and('be.checked');
+	selectors.chooseWordPress().should('be.visible').and('not.be.checked');
+	selectors.url().should('be.visible');
+	selectors.newTab().should('be.visible');
 };
 
 const save = () => {
@@ -79,102 +69,80 @@ describe('Block Editor', () => {
 	const draftTitle = postTitle();
 	const draftSlug = draftTitle.toLowerCase().replace(/ /g, '-');
 
-	before(() => {
+	it('supports Page Links To panel with radio buttons, URL persistence, and new tab checkbox', () => {
 		cy.login();
 		cy.deactivatePlugin('classic-editor');
 		cy.visit('/wp-admin/post-new.php?post_type=page');
 		cy.url().should('contain', '/wp-admin/post-new.php?post_type=page');
-	});
 
-	// prettier-ignore
-	beforeEach(() => {
-		// Aliases.
-		cy.get('.plt-panel')
-			.as('panel');
-		cy.get('.editor-post-title__input').first()
-			.as('title');
-		cy.get('.edit-post-sidebar')
-			.as('sidebar');
-		cy.get('.editor-post-publish-panel__toggle')
-			.as('publishButton');
-	});
-
-	context('title', () => {
-		it('is filled', () => {
-			cy.get('button[aria-label="Close dialog"]').click({ force: true });
-			cy.get('@title').type(draftTitle);
-		});
-	});
-
-	context('panel', () => {
-		it('is open', openPanel);
-	});
-
-	context('radio button', () => {
-		it('starts choosing a normal WordPress URL', () => {
-			assertWordPress();
+		// Close the welcome dialog if it appears.
+		cy.get('body').then(($body) => {
+			if ($body.find('button[aria-label="Close dialog"]').length) {
+				cy.get('button[aria-label="Close dialog"]').click({ force: true });
+			}
 		});
 
-		it('stays the same after saving a draft', () => {
-			selectors.saveButton().click();
-			selectors.savedNotice().should('be.visible');
-			assertWordPress();
-		});
+		// In WordPress 6.x+, the editor canvas is inside an iframe.
+		cy.get('iframe[name="editor-canvas"]')
+			.its('0.contentDocument.body')
+			.should('not.be.empty')
+			.then(cy.wrap)
+			.find('[aria-label="Add title"], .editor-post-title__input')
+			.first()
+			.type(draftTitle);
 
-		it('chooses custom', () => {
-			clickCustom();
-			assertCustom();
-		});
+		// Open the PLT panel.
+		openPanel();
 
-		it('chooses WordPress', () => {
-			clickWordPress();
-			assertWordPress();
-		});
-	});
+		// Starts with WordPress URL selected.
+		assertWordPress();
 
-	context('url', () => {
-		it('persists through changing link type', () => {
-			clickCustom();
-			selectors.url().clear().type(linkedUrl);
-			clickWordPress();
-			clickCustom();
-			selectors.url().should('have.value', linkedUrl);
-		});
+		// Stays the same after saving a draft.
+		selectors.saveButton().click();
+		selectors.savedNotice().should('be.visible');
+		assertWordPress();
 
-		it('saves its state', () => {
-			save();
-			selectors.chooseCustom().should('be.checked');
-			selectors.url().should('have.value', linkedUrl);
-		});
-	});
+		// Choosing custom shows custom UI.
+		clickCustom();
+		assertCustom();
 
-	context('new tab checkbox', () => {
-		it('persists through checking/unchecking', () => {
-			selectors.newTab().check();
-			selectors.newTab().should('be.checked');
-			clickWordPress();
-			clickCustom();
-			selectors.newTab().should('be.checked');
-		});
+		// Choosing WordPress hides custom UI.
+		clickWordPress();
+		assertWordPress();
 
-		it('saves its state', () => {
-			save();
-			selectors.newTab().should('be.checked');
-		});
-	});
+		// URL persists through changing link type.
+		clickCustom();
+		selectors.url().clear().type(linkedUrl);
+		clickWordPress();
+		clickCustom();
+		selectors.url().should('have.value', linkedUrl);
 
-	context('short url', () => {
-		it('should redirect to its custom URL', () => {
-			cy.get('@publishButton').click();
-			selectors.publishButton().click();
-			cy.request({
-				url: `/${draftSlug}/`,
-				followRedirect: false,
-				failOnStatusCode: false,
-			}).then((resp) => {
-				expect(resp.status).to.eq(301);
-				expect(resp.redirectedToUrl).to.eq(linkedUrl);
-			});
+		// URL saves its state.
+		save();
+		selectors.chooseCustom().should('be.checked');
+		selectors.url().should('have.value', linkedUrl);
+
+		// New tab checkbox persists through checking/unchecking.
+		selectors.newTab().check();
+		selectors.newTab().should('be.checked');
+		clickWordPress();
+		clickCustom();
+		selectors.newTab().should('be.checked');
+
+		// New tab checkbox saves its state.
+		save();
+		selectors.newTab().should('be.checked');
+
+		// Publish and verify the short URL redirects to the custom URL.
+		cy.get('.editor-post-publish-panel__toggle').click();
+		selectors.publishButton().click();
+		cy.request({
+			url: `/${draftSlug}/`,
+			followRedirect: false,
+			failOnStatusCode: false,
+		}).then((resp) => {
+			expect(resp.status).to.eq(301);
+			expect(resp.redirectedToUrl).to.eq(linkedUrl);
 		});
 	});
 });
