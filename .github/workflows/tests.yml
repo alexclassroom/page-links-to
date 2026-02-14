@@ -57,7 +57,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-dist --ignore-platform-req=php+
 
       - name: Install WordPress test suite
         run: bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 ${{ matrix.wp }}
@@ -102,6 +102,14 @@ jobs:
 
       - name: Install Node dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Build plugin assets
+        run: |
+          mkdir -p dist
+          cp node_modules/clipboard/dist/clipboard.min.js dist/clipboard.min.js
+          npx webpack --mode=production
+        env:
+          NODE_ENV: production
 
       - name: Install WP-CLI
         run: |
