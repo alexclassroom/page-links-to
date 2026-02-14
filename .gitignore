@@ -11,6 +11,9 @@
 # Composer
 /vendor
 
+# PHPUnit
+.phpunit.result.cache
+
 # Cypress
 /cypress/screenshots/
 /cypress/videos/
