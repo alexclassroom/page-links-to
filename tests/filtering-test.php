@@ -1,13 +1,13 @@
 <?php
 
 class CWS_PLT_Test_Filtering extends CWS_PLT_TestCase {
-	function test_get_permalink_filter() {
+	public function test_get_permalink_filter(): void {
 		$post_id = $this->factory->post->create( array( 'post_type' => 'post' ) );
 		$this->assertTrue( $this->plugin()->set_link( $post_id, 'http://example.com/' ) );
 		$this->assertEquals( 'http://example.com/', get_permalink( $post_id ) );
 	}
 
-	function test_get_original_permalink() {
+	public function test_get_original_permalink(): void {
 		$post_id = $this->factory->post->create( array( 'post_type' => 'post' ) );
 		$original_permalink = get_permalink( $post_id );
 		$this->assertTrue( $this->plugin()->set_link( $post_id, 'http://example.com/' ) );
@@ -15,17 +15,17 @@ class CWS_PLT_Test_Filtering extends CWS_PLT_TestCase {
 		$this->assertEquals( $original_permalink, plt_get_original_permalink( $post_id ) );
 	}
 
-	function test_wp_list_posts_filter() {
+	public function test_wp_list_posts_filter(): void {
 		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
 		$this->assertTrue( $this->plugin()->set_link( $post_id, 'http://example.com/' ) );
 		$this->assertTrue( $this->plugin()->set_link_new_tab( $post_id ) );
 		ob_start();
 		wp_list_pages();
 		$wp_list_pages = ob_get_clean();
-		$this->assertContains( '#new_tab', $wp_list_pages );
+		$this->assertStringContainsString( '#new_tab', $wp_list_pages );
 	}
 
-	function test_nav_menu_items_filter() {
+	public function test_nav_menu_items_filter(): void {
 		$post_id = $this->factory->post->create( array( 'post_type' => 'page', 'post_status' => 'publish' ) );
 		$post = get_post( $post_id );
 		$this->assertTrue( $this->plugin()->set_link( $post_id, 'http://example.com/' ) );
@@ -35,7 +35,7 @@ class CWS_PLT_Test_Filtering extends CWS_PLT_TestCase {
 		$user_id = $this->factory->user->create( array( 'role' => 'editor' ) );
 		wp_set_current_user( $user_id );
 		$menu_id = wp_create_nav_menu( 'plt' );
-		$this->assertInternalType( 'int', $menu_id, "Menu creation failed" );
+		$this->assertIsInt( $menu_id, "Menu creation failed" );
 		$item_id = wp_update_nav_menu_item( $menu_id, 0, array(
 			'menu-item-object-id' => $post_id,
 			'menu-item-object' => $post->post_type,
@@ -43,7 +43,7 @@ class CWS_PLT_Test_Filtering extends CWS_PLT_TestCase {
 			'menu-item-status' => 'publish',
 		));
 		$wp_nav_menu = wp_nav_menu( array( 'echo' => false, 'menu' => $menu_id, 'fallback_cb' => false ) );
-		$this->assertInternalType( 'string', $wp_nav_menu, 'Menu is empty' );
-		$this->assertContains( 'target="_blank"', $wp_nav_menu );
+		$this->assertIsString( $wp_nav_menu, 'Menu is empty' );
+		$this->assertStringContainsString( 'target="_blank"', $wp_nav_menu );
 	}
 }
