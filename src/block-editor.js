@@ -9,6 +9,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { PluginPostStatusInfo } from '@wordpress/edit-post';
+import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 
 const panelTitle = window?.pltOptions?.panelTitle ?? 'Page Links To';
@@ -39,11 +40,14 @@ const PointsTo = ({ enabled, onToggle }) => {
 
 	return (
 		<RadioControl
-			label="Point this content to:"
+			label={__('Point this content to:', 'page-links-to')}
 			selected={option}
 			options={[
-				{ label: 'Its normal WordPress URL', value: 'wordpress' },
-				{ label: 'A custom URL', value: 'custom' },
+				{
+					label: __('Its normal WordPress URL', 'page-links-to'),
+					value: 'wordpress',
+				},
+				{ label: __('A custom URL', 'page-links-to'), value: 'custom' },
 			]}
 			onChange={(newOption) => {
 				setOption(newOption);
@@ -116,7 +120,7 @@ const LinksTo = () => {
 				<>
 					<PanelRow>
 						<TextControl
-							label="Links to"
+							label={__('Links to', 'page-links-to')}
 							data-testid="plt-url"
 							value={displayUrl}
 							onChange={onUpdateLink}
@@ -126,7 +130,7 @@ const LinksTo = () => {
 					{window.pltOptions.supports.newTab && (
 						<PanelRow>
 							<CheckboxControl
-								label="Open in new tab"
+								label={__('Open in new tab', 'page-links-to')}
 								data-testid="plt-newtab"
 								checked={newTab}
 								onChange={onUpdateNewTab}

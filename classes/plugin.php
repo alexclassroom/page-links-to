@@ -356,6 +356,7 @@ class CWS_PageLinksTo {
 		if ( self::is_block_editor() && self::is_supported_post_type() ) {
 			$asset_file = include $this->get_path() . 'dist/block-editor.asset.php';
 			wp_enqueue_script( 'plt-block-editor', $this->get_url() . 'dist/block-editor.js', $asset_file['dependencies'], self::CSS_JS_VERSION, true );
+			wp_set_script_translations( 'plt-block-editor', 'page-links-to', $this->get_path() . 'languages' );
 			wp_localize_script( 'plt-block-editor', 'pltOptions', [
 				'supports' => [
 					'newTab' => self::supports( 'new_tab' ),
@@ -1089,7 +1090,7 @@ class CWS_PageLinksTo {
 			return;
 		}
 
-		echo '<div class="plt-links-to"><strong>' . __( 'Links to:', 'page-links-to' ) . '</strong> <a href="' . esc_url( $link ) . '">' . esc_html( $link ) . '</a> <button type="button" class="edit-slug button button-small hide-if-no-js">Edit</button></div>';
+		echo '<div class="plt-links-to"><strong>' . __( 'Links to:', 'page-links-to' ) . '</strong> <a href="' . esc_url( $link ) . '">' . esc_html( $link ) . '</a> <button type="button" class="edit-slug button button-small hide-if-no-js">' . __( 'Edit', 'page-links-to' ) . '</button></div>';
 	}
 
 	/**
