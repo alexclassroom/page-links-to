@@ -28,7 +28,7 @@ function cleanUpReleaseFiles() {
 		'readme.md',
 		'package.json',
 		'webpack.config.js',
-		'yarn.lock',
+		'bun.lock',
 		'composer.json',
 		'composer.lock',
 		'babel.config.js',

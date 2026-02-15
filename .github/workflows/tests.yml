@@ -97,20 +97,17 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, mysqli, pdo_mysql, intl, gd, exif, iconv
           coverage: none
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: yarn
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install Node dependencies
-        run: yarn install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Install Playwright browsers
-        run: npx playwright install chromium
+        run: bunx playwright install chromium
 
       - name: Build plugin assets
-        run: npx grunt default:prod
+        run: bunx grunt default:prod
 
       - name: Install WP-CLI
         run: |
@@ -154,7 +151,7 @@ jobs:
           done
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: bunx playwright test
         env:
           BASE_URL: http://localhost:8080
           WP_USERNAME: admin
