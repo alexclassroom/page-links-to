@@ -7,7 +7,7 @@ node_modules
 /img/src
 /Gruntfile.*
 /package.json
-/yarn.lock
+/bun.lock
 /.gitignore
 /.gitmodules
 /tests
