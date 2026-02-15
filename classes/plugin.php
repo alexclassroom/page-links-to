@@ -362,9 +362,7 @@ class CWS_PageLinksTo {
 					'newTab' => self::supports( 'new_tab' ),
 				],
 				'panelTitle' => self::get_panel_title(),
-				'supportedPostTypes' => (array) apply_filters( 'page-links-to-post-types', array_keys( get_post_types( array(
-					'show_ui' => true,
-				) ) ) ),
+				'supportedPostTypes' => (array) apply_filters( 'page-links-to-post-types', self::get_default_post_types() ),
 			]);
 			do_action( 'page_links_to_enqueue_block_editor_assets' );
 		}
@@ -497,6 +495,28 @@ class CWS_PageLinksTo {
 	}
 
 	/**
+	 * Get the default post types that support custom links.
+	 *
+	 * Returns post types that are publicly queryable with a UI,
+	 * plus the 'page' post type (which is public but not publicly_queryable).
+	 *
+	 * @return array List of post type names.
+	 */
+	public static function get_default_post_types() {
+		$post_types = array_keys( get_post_types( array(
+			'publicly_queryable' => true,
+			'show_ui'            => true,
+		) ) );
+
+		// Pages are public but not publicly_queryable, and are a core use case.
+		if ( ! in_array( 'page', $post_types, true ) ) {
+			$post_types[] = 'page';
+		}
+
+		return $post_types;
+	}
+
+	/**
 	 * Determine whether a post type supports custom links.
 	 *
 	 * @param string $type The post type to check.
@@ -519,9 +539,7 @@ class CWS_PageLinksTo {
 		*/
 		$hook = 'page-links-to-post-types';
 
-		$supported_post_types = (array) apply_filters( $hook, array_keys( get_post_types( array(
-			'show_ui' => true,
-		) ) ) );
+		$supported_post_types = (array) apply_filters( $hook, self::get_default_post_types() );
 
 		return in_array( $type, $supported_post_types );
 	}
