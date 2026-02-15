@@ -63,12 +63,12 @@ test.describe('Quick Links', () => {
 		await expect(
 			page.locator('#plt-quick-add input[name="title"]')
 		).toHaveValue('');
-		await expect(
-			page.locator('#plt-quick-add input[name="url"]')
-		).toHaveValue('');
-		await expect(
-			page.locator('#plt-quick-add input[name="slug"]')
-		).toHaveValue('');
+		await expect(page.locator('#plt-quick-add input[name="url"]')).toHaveValue(
+			''
+		);
+		await expect(page.locator('#plt-quick-add input[name="slug"]')).toHaveValue(
+			''
+		);
 
 		// Save and publish start disabled.
 		await expect(page.locator('#plt-quick-add-publish')).toBeDisabled();

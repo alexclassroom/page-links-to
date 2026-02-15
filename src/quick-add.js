@@ -51,7 +51,7 @@ jQuery(($) => {
 	const $slug = $modal.find('[name="slug"]');
 	const nonce = $modal.find('[name="plt_nonce"]').val();
 	const defaultSlugPlaceholder = $slug.prop('placeholder');
-	const { fancyUrls } = window.pltVars;
+	const { fancyUrls, addPageLink } = window.pltVars;
 
 	const modalAction = (action) => () => $modal.dialog(action);
 	const isOpen = modalAction('isOpen');
@@ -156,7 +156,7 @@ jQuery(($) => {
 	const publish = noDefaultEvent(() => submit({ publish: true }));
 
 	$modal.dialog({
-		title: 'Add Page Link',
+		title: addPageLink,
 		dialogClass: 'wp-dialog plt-ui-dialog',
 		autoOpen: false,
 		draggable: false,
