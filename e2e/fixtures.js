@@ -66,7 +66,12 @@ const test = base.extend({
 		const created = [];
 
 		const muPlugin = (filename, content) => {
-			const muDir = path.resolve(__dirname, '../../../mu-plugins');
+			const contentDir = execSync(`wp eval "echo WP_CONTENT_DIR;"`, {
+				stdio: 'pipe',
+			})
+				.toString()
+				.trim();
+			const muDir = path.join(contentDir, 'mu-plugins');
 			const filePath = path.join(muDir, filename);
 			fs.mkdirSync(muDir, { recursive: true });
 			fs.writeFileSync(filePath, content);
