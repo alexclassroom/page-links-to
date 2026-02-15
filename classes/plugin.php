@@ -362,6 +362,9 @@ class CWS_PageLinksTo {
 					'newTab' => self::supports( 'new_tab' ),
 				],
 				'panelTitle' => self::get_panel_title(),
+				'supportedPostTypes' => (array) apply_filters( 'page-links-to-post-types', array_keys( get_post_types( array(
+					'show_ui' => true,
+				) ) ) ),
 			]);
 			do_action( 'page_links_to_enqueue_block_editor_assets' );
 		}
