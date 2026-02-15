@@ -1,5 +1,7 @@
 const { test: base, expect } = require('@playwright/test');
 const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Custom test fixture that provides WordPress helper utilities.
@@ -10,7 +12,7 @@ const test = base.extend({
 	 */
 	wpCli: async ({}, use) => {
 		const wpCli = (command) => {
-			execSync(`wp ${command}`, { stdio: 'pipe' });
+			return execSync(`wp ${command}`, { stdio: 'pipe' }).toString().trim();
 		};
 		await use(wpCli);
 	},
@@ -55,6 +57,37 @@ const test = base.extend({
 			});
 		};
 		await use(hoverWpMenuItem);
+	},
+
+	/**
+	 * Add a mu-plugin file (auto-removed after test).
+	 */
+	muPlugin: async ({}, use) => {
+		const created = [];
+
+		const muPlugin = (filename, content) => {
+			const contentDir = execSync(`wp eval "echo WP_CONTENT_DIR;"`, {
+				stdio: 'pipe',
+			})
+				.toString()
+				.trim();
+			const muDir = path.join(contentDir, 'mu-plugins');
+			const filePath = path.join(muDir, filename);
+			fs.mkdirSync(muDir, { recursive: true });
+			fs.writeFileSync(filePath, content);
+			created.push(filePath);
+		};
+
+		await use(muPlugin);
+
+		// Cleanup: remove all mu-plugins created during this test.
+		for (const filePath of created) {
+			try {
+				fs.unlinkSync(filePath);
+			} catch (e) {
+				// Ignore if already removed.
+			}
+		}
 	},
 });
 

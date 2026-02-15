@@ -57,17 +57,26 @@ const PointsTo = ({ enabled, onToggle }) => {
 	);
 };
 
+const supportedPostTypes = window?.pltOptions?.supportedPostTypes ?? [];
+
 const LinksTo = () => {
-	const { url, newTab } = useSelect((select) => {
+	const { url, newTab, currentPostType } = useSelect((select) => {
 		const getMeta = (attr) =>
 			(select('core/editor').getEditedPostAttribute('meta') || [])[attr];
 		return {
 			url: getMeta('_links_to'),
 			newTab: getMeta('_links_to_target') === '_blank',
+			currentPostType: select('core/editor').getCurrentPostType(),
 		};
 	}, []);
 
 	const { editPost } = useDispatch('core/editor');
+
+	// Hide the panel if the current post type is not supported (e.g., when
+	// switching from a post to editing a pattern inline).
+	if (currentPostType && !supportedPostTypes.includes(currentPostType)) {
+		return null;
+	}
 
 	const onUpdateLink = (link) => {
 		editPost({ meta: { _links_to: link } });
