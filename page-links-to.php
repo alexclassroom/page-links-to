@@ -13,7 +13,7 @@
  * Text Domain: page-links-to
  * Domain Path: /languages
  * Requires PHP: 7.4
- * PHP tested up to: 8.3
+ * PHP tested up to: 8.5
  */
 
 /*
