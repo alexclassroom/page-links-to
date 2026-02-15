@@ -354,7 +354,8 @@ class CWS_PageLinksTo {
 	public function enqueue_block_editor_assets() {
 		// Gutenberg.
 		if ( self::is_block_editor() && self::is_supported_post_type() ) {
-			wp_enqueue_script( 'plt-block-editor', $this->get_url() . 'dist/block-editor.js', array( 'wp-edit-post', 'wp-element', 'wp-plugins' ), self::CSS_JS_VERSION, true );
+			$asset_file = include $this->get_path() . 'dist/block-editor.asset.php';
+			wp_enqueue_script( 'plt-block-editor', $this->get_url() . 'dist/block-editor.js', $asset_file['dependencies'], self::CSS_JS_VERSION, true );
 			wp_localize_script( 'plt-block-editor', 'pltOptions', [
 				'supports' => [
 					'newTab' => self::supports( 'new_tab' ),
