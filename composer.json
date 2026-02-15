@@ -1,7 +1,6 @@
 {
     "name": "markjaquith/page-links-to",
     "description": "Lets you make a WordPress page (or port or other content type) link to a URL of your choosing (on your site, or on another site), instead of its normal WordPress URL",
-    "require": {},
     "require-dev": {
         "phpunit/phpunit": "^9.6",
         "yoast/phpunit-polyfills": "^3.0",
@@ -10,7 +9,8 @@
         "wp-coding-standards/wpcs": "*",
         "sirbrillig/phpcs-variable-analysis": "^2.5",
         "phpcompatibility/php-compatibility": "^9.1",
-        "phpcompatibility/phpcompatibility-wp": "*"
+        "phpcompatibility/phpcompatibility-wp": "*",
+        "php-stubs/wordpress-stubs": "^6.9"
     },
     "config": {
         "allow-plugins": {
