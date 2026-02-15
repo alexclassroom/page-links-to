@@ -1,7 +1,4 @@
-/**
- * @jest-environment jsdom
- */
-
+import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { handleClicks, handleExistingElements } from './newTab';
 
 const $ = document.getElementById.bind(document);
