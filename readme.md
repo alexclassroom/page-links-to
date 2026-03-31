@@ -7,7 +7,7 @@ Donate link: https://txfx.net/wordpress-plugins/donate
 Tags: page, redirect, link, external link, repoint  
 Requires at least: 6.8  
 Tested up to: 6.9  
-Stable tag: 3.3.7  
+Stable tag: 3.4.0  
 
 Lets you make a WordPress page (or port or other content type) link to a URL of your choosing (on your site, or on another site), instead of its normal WordPress URL.
 
